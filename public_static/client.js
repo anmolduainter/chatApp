@@ -20,7 +20,14 @@ $(function () {
 
     submitBtn.click(function () {
 
-        nameSend=name.val();
+        socket.emit('login',name.val());
+
+        socket.on('logged_in',data=>{
+
+            nameSend=data;
+
+        });
+
         changeDom();
 
     })
@@ -70,9 +77,21 @@ function changeDom(){
 
 function send(){
 
+    arrSend=[];
 
-    arrSend.push(nameSend,sendText.val())
-    console.log(JSON.stringify(arrSend))
-    socket.emit('send_message',JSON.stringify(arrSend))
+    let text=sendText.val();
 
+    if (text.charAt(0)==='@'){
+
+        arrSend.push(text.substr(1).split(' ')[0],nameSend,sendText.val().replace(text.split(' ')[0],''))
+        console.log(arrSend);
+        socket.emit('send_message',JSON.stringify(arrSend))
+    }
+    else{
+
+        arrSend.push(nameSend,sendText.val())
+        console.log(JSON.stringify(arrSend))
+        socket.emit('send_message',JSON.stringify(arrSend))
+
+    }
 }

@@ -1,51 +1,80 @@
 /**
- * Created by anmol on 14/7/17.
+ * Created by anmol on 16/7/17.
  */
-
 
 let socket=io();
 
 let container;
-let nameSend;
-let chatList;
-let email;
-let arrSend=[];
+let input;
+let submit;
 let sendBtn;
+let nameSend;
 let sendText;
+let chatList;
 $(function () {
 
-
     container=$('.container');
-    let name=$('#name');
-    let email=$('#email')
-    let submitBtn=$('#submit');
-
-    submitBtn.click(function () {
-
-        let nameval=name.val();
-        let emailval=email.val();
-
-        $.post('/register',{nameval:nameval,emailval:emailval},function (res) {
-
-
-            socket.emit('Register',res);
-
-            socket.on('logged_in',data=>{
-                nameSend=data;
-            });
-
-
-
-        })
-
-        changeDom();
-
-    })
-
+    submit=$('#submit');
+    input=$('#name')
+    submit.click(checkUser)
 
 });
 
-function changeDom(){
+function checkUser() {
+
+    let name=input.val()
+    $.get('/detLog',function (data) {
+
+        let a=-1;
+
+        let dataId;
+
+        for (i in data){
+
+            if (data[i].username==name){
+
+                a=1;
+                dataId=data[i].id
+
+                nameSend=data[i].username;
+
+            }
+        }
+
+        if (a==1){
+            getChats(dataId)
+        }
+        else if (a==-1){
+            alert("No match found")
+        }
+
+    })
+
+}
+
+function getChats(i) {
+
+    let messArr=[];
+
+    console.log(i);
+    $.post('/getChats',{id:i},function (data) {
+
+      console.log(data.success);
+
+      messArr=data.success;
+
+        console.log(messArr);
+
+      changeDom(messArr)
+
+    })
+
+}
+
+
+function changeDom(mesArr){
+
+    console.log(mesArr);
 
     container.empty();
 
@@ -75,6 +104,11 @@ function changeDom(){
     sendText=$('#message');
     sendBtn=$('#sendBtn');
     chatList=$('#send-list');
+
+    for (i of mesArr){
+        chatList.append($(`<li>${i}</li>`))
+    }
+
     socket.on('recv_message', (data) => {
         chatList.append($(`<li>${data}</li>`))
     })
@@ -86,7 +120,7 @@ function changeDom(){
 
 function send(){
 
-    arrSend=[];
+   let arrSend=[];
 
     let text=sendText.val();
 

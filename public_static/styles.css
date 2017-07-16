@@ -1,6 +1,22 @@
- #list-box{
+body{
+    background: url("wall.jpg");
+}
 
+ #send-list{
      height: 400px;
      overflow: scroll;
+     list-style-type: none;
+     color: white;
+ }
+ .list-box{
+
+     background: mintcream;
+
+ }
+
+ .jumbotron{
+
+     color: white;
+     background:transparent;
 
  }

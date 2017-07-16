@@ -6,15 +6,14 @@
 let express=require('express');
 let http=require('http');
 let io=require('socket.io');
-
+let Message=require('./db').Message;
 
 const app=express();
 const server=http.Server(app);
 const socketio=io(server);
 
-
 let users={};
-
+let chatArr=[];
 app.use('/', express.static(__dirname + "/public_static"))
 app.get('/hello',(r,s)=>{
 
@@ -30,11 +29,14 @@ socketio.on('connection',function (socket) {
     socket.on('login',function(username){
 
 
-        users[socket.id]=username;
+        console.log(username.nameval);
+        console.log(username.emailval);
 
-        socket.join(username);
+        users[socket.id]=username.nameval;
 
-        socket.emit('logged_in',username);
+        socket.join(username.nameval);
+
+        socket.emit('logged_in',username.nameval);
 
     });
 
@@ -42,12 +44,14 @@ socketio.on('connection',function (socket) {
     socket.on('send_message',function (data) {
         let arr=JSON.parse(data);
         if (arr.length==3){
-            let chat = `only to u -->  ${arr[1]} : ${arr[2]}`
+            let chat = ` # ${arr[1]} : ${arr[2]}`
+            chatArr.push(chat);
             socketio.to(arr[0]).emit('recv_message', chat);
         }
         else if (arr.length==2){
             console.log(data);
             let chat = `${arr[0]} : ${arr[1]}`
+            chatArr.push(chat);
             console.log(chat);
             socketio.emit('recv_message', chat)
         }
@@ -58,3 +62,4 @@ socketio.on('connection',function (socket) {
 server.listen(9000,function(){
     console.log("Server started")
 })
+

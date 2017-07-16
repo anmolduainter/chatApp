@@ -8,6 +8,7 @@ let socket=io();
 let container;
 let nameSend;
 let chatList;
+let email;
 let arrSend=[];
 let sendBtn;
 let sendText;
@@ -16,16 +17,18 @@ $(function () {
 
     container=$('.container');
     let name=$('#name');
+    let email=$('#email')
     let submitBtn=$('#submit');
 
     submitBtn.click(function () {
 
-        socket.emit('login',name.val());
+        let nameval=name.val();
+        let emailval=email.val();
+
+        socket.emit('login',{nameval,emailval});
 
         socket.on('logged_in',data=>{
-
             nameSend=data;
-
         });
 
         changeDom();
@@ -42,18 +45,18 @@ function changeDom(){
     let body=$(`
  
   <div class="row">
-        <div class="col" id="list-box">
-            <ul id="list">
+        <div class="col text-center" class="list-box">
+            <ul id="send-list">
               
             </ul>
         </div>
-
     </div>
-
+  
+    <br>
 
     <div class="row">
-        <div class="col">
-            <input type="text" id="message">
+        <div class="col text-center">
+            <input placeholder="Write Message" type="text" id="message">
             <button id="sendBtn" class="btn btn-primary pull-right">Send</button>
         </div>
      </div>
@@ -64,8 +67,7 @@ function changeDom(){
 
     sendText=$('#message');
     sendBtn=$('#sendBtn');
-    chatList=$('#list');
-
+    chatList=$('#send-list');
     socket.on('recv_message', (data) => {
         chatList.append($(`<li>${data}</li>`))
     })

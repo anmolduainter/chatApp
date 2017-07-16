@@ -11,6 +11,7 @@ module.exports = (sequelize,Datatypes)=>{
            type:Datatypes.DataTypes.INTEGER,
            primaryKey:true,
            autoIncrement:true,
+           allowNull:false
 
        },
 
@@ -29,6 +30,8 @@ module.exports = (sequelize,Datatypes)=>{
        }
 
 
+   },{
+       underscored:true
    })
 
     return Login;

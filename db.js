@@ -41,18 +41,19 @@ db.Sequelize=Sequelize;
 db.sequelize=sequelize;
 
 db.login=require('./models/login.js')(sequelize,Sequelize);
-db.messgaes=require('./models/messages.js')(sequelize,Sequelize);
+db.messages=require('./models/messages.js')(sequelize,Sequelize);
+db.Pmessages=require('./models/Pmessages.js')(sequelize,Sequelize);
 
-
+db.Pmessages.belongsTo(db.login);
+db.login.hasMany(db.Pmessages);
 
 sequelize.sync().then(function () {
     console.log("DataBase is ready");
 })
 
 
-module.exports={
-    Message
-}
+module.exports=db
+
 
 
 

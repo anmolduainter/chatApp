@@ -6,7 +6,7 @@
 let express=require('express');
 let http=require('http');
 let io=require('socket.io');
-let Message=require('./db').Message;
+let db=require('./db');
 
 const app=express();
 const server=http.Server(app);

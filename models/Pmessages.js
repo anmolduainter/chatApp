@@ -4,17 +4,25 @@
 
 module.exports= (sequelize,Datatype)=>{
 
-    const BroadMessage=sequelize.define('Messages',{
+    const PMessage=sequelize.define('PMessages',{
 
         id:{
             type:Datatype.DataTypes.INTEGER,
             primaryKey:true,
             autoIncrement:true,
+            allowNull:false
+        },
+
+        login_id:{
+
+            type:Datatype.DataTypes.INTEGER,
+            allowNull:false
+
         },
 
         message:{
 
-          type:Datatype.DataTypes.STRING
+            type:Datatype.DataTypes.STRING
 
         }
 
@@ -24,7 +32,6 @@ module.exports= (sequelize,Datatype)=>{
         underscored:true
     })
 
-    return BroadMessage;
-
+  return PMessage;
 
 }

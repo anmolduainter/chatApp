@@ -7,10 +7,12 @@ body{
      overflow: scroll;
      list-style-type: none;
      color: white;
+     font-size: 30px;
+     font-weight: bold;
  }
  .list-box{
 
-     background: mintcream;
+    background: mintcream;
 
  }
 

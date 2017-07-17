@@ -28,24 +28,48 @@ $(function () {
         $.post('/register',{nameval:nameval,emailval:emailval},function (res) {
 
 
-            socket.emit('Register',res);
+           // socket.emit('Register',res);
 
-            socket.on('logged_in',data=>{
-                nameSend=data;
-            });
+            // socket.on('logged_in',data=>{
+            //     nameSend=data;
+            // });
 
+            nameSend=res;
+
+            socket.emit('login',nameSend);
+
+            console.log(nameSend);
+
+            getChats();
 
 
         })
-
-        changeDom();
 
     })
 
 
 });
 
-function changeDom(){
+
+function getChats(){
+
+    let marr=[];
+
+    $.get('/getRChats',function (data) {
+
+        for (i of data){
+            marr.push(i.message);
+        }
+
+        changeDom(marr)
+
+
+    })
+
+}
+
+
+function changeDom(marr){
 
     container.empty();
 
@@ -75,6 +99,9 @@ function changeDom(){
     sendText=$('#message');
     sendBtn=$('#sendBtn');
     chatList=$('#send-list');
+    for (i of marr){
+        chatList.append($(`<li>${i}</li><br>`))
+    }
     socket.on('recv_message', (data) => {
         chatList.append($(`<li>${data}</li>`))
     })
@@ -94,7 +121,21 @@ function send(){
 
         arrSend.push(text.substr(1).split(' ')[0],nameSend,sendText.val().replace(text.split(' ')[0],''))
         console.log(arrSend);
-        socket.emit('send_message',JSON.stringify(arrSend))
+       // socket.emit('send_message',JSON.stringify(arrSend))
+
+
+        $.get('/detLog',function (data) {
+
+            for (i of data) {
+                if (i.username == arrSend[0]) {
+                    arrSend.push(i.id)
+                    socket.emit('send_message',JSON.stringify(arrSend))
+                }
+            }
+        })
+
+
+
     }
     else{
 

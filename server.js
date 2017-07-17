@@ -48,30 +48,36 @@ socketio.on('connection',function (socket) {
 
         users[socket.id]=username;
 
-        socket.join(username);
+        socket.join(username);             //very important line
 
-        socket.emit('logged_in',username);
 
     });
 
 
     socket.on('send_message',function (data) {
         let arr=JSON.parse(data);
-        if (arr.length==3){
-            let chat = ` # ${arr[1]} : ${arr[2]}`
-            chatArr.push(chat);
+        console.log(arr);
+        if (arr.length==4) {
+
+            let chat = ` # ${arr[1]} : ${arr[2]}`;
             db.Pmessages.create({
-                login_id:userid,
-                message:chat
+                login_id: arr[3],
+                message: chat
             }).then(function () {
                 console.log("Particular messages in database")
+              }).catch(function (err) {
+                console.log(err);
             });
+
+            console.log(arr[0]);
             socketio.to(arr[0]).emit('recv_message', chat);
-        }
+
+           }
+
         else if (arr.length==2){
             console.log(data);
             let chat = `${arr[0]} : ${arr[1]}`
-            chatArr.push(chat);
+        //    chatArr.push(chat);
             console.log(chat);
             db.messages.create({
                 message:chat
@@ -81,9 +87,12 @@ socketio.on('connection',function (socket) {
 
             }).catch(function (err) {
                 console.log(err);
-            })
-            socketio.emit('recv_message', chat)
+            });
+
+             socketio.emit('recv_message', chat)
         }
+
+
     })
 
 });
@@ -99,51 +108,73 @@ app.get('/detLog',function (req,res) {
 
 });
 
+app.get('/getRChats',function (req,res) {
+
+   db.messages.findAll().then(function (list) {
+       res.send(list)
+   }).catch(function (err) {
+       console.log("Error occured while retrieving")
+   })
+
+});
+
+
 app.post('/getChats',function (req,res) {
     console.log(req.body.id);
 
- db.login.findAll({
-     include:[{
-         model:db.Pmessages
-     }]
- }) .then(function (data) {
+    db.login.findAll({
+        include: [{
+            model: db.Pmessages
+        }]
+    }).then(function (data) {
 
-     let id=req.body.id;
-     let arr=[];
+        let id = req.body.id;
+        let arr = [];
 
-    // console.log(data)
+//     console.log(data)
 
-     console.log(data[data.length-id].username)
-     console.log(data[data.length-id].email)
-     console.log(data[data.length-id].PMessages)
-     for (i of data[data.length-id].PMessages){
+        for (i of data) {
+            if (i.id == id) {
 
-         console.log(i.message);
-         arr.push(i.message);
+                console.log(i.username)
+                console.log(i.email)
+                console.log(i.PMessages)
 
-     }
 
-     db.messages.findAll().then(function (data1) {
+                for (i1 of i.PMessages) {
 
-            for (i of data1){
+                    console.log(i1.message);
+                    arr.push(i1.message);
+
+                }
+            }
+        }
+
+        db.messages.findAll().then(function (data1) {
+
+            for (i of data1) {
                 arr.push(i.message);
             }
 
-         res.send({success:arr});
+            res.send({success: arr});
 
-     });
-
- })
+        });
 
 
-});
+        // console.log(data[data.length-id].username)
+        // console.log(data[data.length-id].email)
+        // console.log(data[data.length-id].PMessages)
+
+    })
+
+})
 
 app.post('/register',(req,res)=>{
 
 
     db.login.create({
-        username:req.nameval,
-        email : req.emailval
+        username:req.body.nameval,
+        email : req.body.emailval
     }).then(function (data) {
         userid=data.id;
         res.send(data.username);
